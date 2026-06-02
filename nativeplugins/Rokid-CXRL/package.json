@@ -1,0 +1,70 @@
+{
+  "name": "Rokid CXR-L iOS Plugin",
+  "id": "Rokid-CXRL",
+  "version": "0.1.0",
+  "description": "uni-app iOS native plugin wrapper for Rokid CXR-L SDK",
+  "_dp_type": "nativeplugin",
+  "_dp_nativeplugin": {
+    "ios": {
+      "plugins": [
+        {
+          "type": "module",
+          "name": "Rokid-CXRL",
+          "class": "RokidCXRLModule"
+        }
+      ],
+      "integrateType": "framework",
+      "hooksClass": "RokidCXRLPluginProxy",
+      "frameworks": [
+        "UIKit.framework",
+        "Foundation.framework",
+        "CoreBluetooth.framework",
+        "Network.framework",
+        "AVFoundation.framework",
+        "RGCxrClient.framework",
+        "RGCoreKit.framework",
+        "CocoaLumberjack.framework"
+      ],
+      "embedFrameworks": [
+        "RGCxrClient.framework",
+        "RGCoreKit.framework",
+        "CocoaLumberjack.framework"
+      ],
+      "embedSwift": true,
+      "deploymentTarget": "16.0",
+      "validArchitectures": [
+        "arm64"
+      ],
+      "plists": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleTypeRole": "Editor",
+            "CFBundleURLName": "com.rokid.cxrl",
+            "CFBundleURLSchemes": [
+              "cxrl"
+            ]
+          }
+        ],
+        "LSApplicationQueriesSchemes": [
+          "rokidai"
+        ],
+        "UIBackgroundModes": [
+          "bluetooth-central"
+        ],
+        "NSBluetoothAlwaysUsageDescription": "This app uses Bluetooth to connect to Rokid AI glasses.",
+        "NSBluetoothPeripheralUsageDescription": "This app uses Bluetooth to connect to Rokid AI glasses.",
+        "NSMicrophoneUsageDescription": "This app uses microphone audio features with Rokid AI glasses.",
+        "NSCameraUsageDescription": "This app uses camera features from Rokid AI glasses.",
+        "NSPhotoLibraryAddUsageDescription": "This app saves photos captured from Rokid AI glasses."
+      },
+      "privacies": [
+        "NSBluetoothAlwaysUsageDescription",
+        "NSBluetoothPeripheralUsageDescription",
+        "NSMicrophoneUsageDescription",
+        "NSCameraUsageDescription",
+        "NSPhotoLibraryAddUsageDescription"
+      ]
+    }
+  }
+}
+
