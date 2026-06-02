@@ -421,20 +421,39 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
-    private func notifyPayload(_ event: RGCxrClientNotifyEvent) -> [String: Any] {
+    private func notifyPayload(_ event: Any) -> [String: Any] {
         var data: [String: Any] = [
-            "cmd": event.cmd,
-            "subCmd": event.subCmd,
-            "reqId": event.reqId,
-            "status": event.status
+            "cmd": string(mirrorValue("cmd", in: event)) ?? "",
+            "subCmd": string(mirrorValue("subCmd", in: event)) ?? "",
+            "reqId": int(mirrorValue("reqId", in: event)) ?? 0,
+            "status": int(mirrorValue("status", in: event)) ?? 0
         ]
-        if let payload = event.payload {
+        if let payload = mirrorValue("payload", in: event) as? Data {
             data["payloadBase64"] = payload.base64EncodedString()
         }
-        if let payloadEx = event.payloadEx {
+        if let payloadEx = mirrorValue("payloadEx", in: event) as? Data {
             data["payloadExBase64"] = payloadEx.base64EncodedString()
         }
         return data
+    }
+
+    private func mirrorValue(_ name: String, in value: Any) -> Any? {
+        var current: Mirror? = Mirror(reflecting: value)
+        while let mirror = current {
+            if let child = mirror.children.first(where: { $0.label == name }) {
+                return unwrapOptional(child.value)
+            }
+            current = mirror.superclassMirror
+        }
+        return nil
+    }
+
+    private func unwrapOptional(_ value: Any) -> Any? {
+        let mirror = Mirror(reflecting: value)
+        guard mirror.displayStyle == .optional else {
+            return value
+        }
+        return mirror.children.first.map { $0.value }
     }
 
     private func audioCodec(_ value: Any?) -> RGCxrAudioCodec {
@@ -515,6 +534,18 @@ public final class RokidCXRLBridge: NSObject {
     private func int(_ value: Any?) -> Int? {
         if let value = value as? Int {
             return value
+        }
+        if let value = value as? Int32 {
+            return Int(value)
+        }
+        if let value = value as? UInt32 {
+            return Int(value)
+        }
+        if let value = value as? Int64 {
+            return Int(value)
+        }
+        if let value = value as? UInt64 {
+            return Int(value)
         }
         if let value = value as? NSNumber {
             return value.intValue
