@@ -6,13 +6,23 @@ cd "$ROOT_DIR"
 
 echo "Using Xcode:"
 xcodebuild -version
+echo "Building git revision:"
+git rev-parse --short HEAD || true
+echo "Using Podfile:"
+cat Podfile
 
 if ! command -v pod >/dev/null 2>&1; then
   echo "CocoaPods is not installed. Installing with gem..."
   sudo gem install cocoapods
 fi
 
+rm -rf Pods RokidCXRLUniPlugin.xcworkspace Podfile.lock
 pod install --repo-update
+
+if [ -d "$ROOT_DIR/Pods/RGCxrClient" ]; then
+  echo "Unexpected Pods/RGCxrClient found. RGCxrClient must come from Vendor/RGCxrClient.framework." >&2
+  exit 1
+fi
 
 BUILD_DIR="$ROOT_DIR/build"
 PACKAGE_DIR="$ROOT_DIR/nativeplugins/Rokid-CXRL"
