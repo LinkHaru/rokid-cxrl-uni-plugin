@@ -18,22 +18,35 @@ BUILD_DIR="$ROOT_DIR/build"
 PACKAGE_DIR="$ROOT_DIR/nativeplugins/Rokid-CXRL"
 IOS_DIR="$PACKAGE_DIR/ios"
 DIST_DIR="$ROOT_DIR/dist"
+BUILD_LOG="$DIST_DIR/build-ios-plugin.log"
+RESULT_BUNDLE="$DIST_DIR/RokidCXRLBuild.xcresult"
 
 rm -rf "$BUILD_DIR" "$DIST_DIR"
 mkdir -p "$IOS_DIR" "$DIST_DIR"
 rm -rf "$IOS_DIR"/*.framework
 
+set +e
 xcodebuild \
   -workspace "$ROOT_DIR/RokidCXRLUniPlugin.xcworkspace" \
   -scheme RokidCXRLUniPlugin \
   -configuration Release \
   -sdk iphoneos \
   -destination "generic/platform=iOS" \
+  -resultBundlePath "$RESULT_BUNDLE" \
   BUILD_DIR="$BUILD_DIR" \
   SKIP_INSTALL=NO \
   BUILD_LIBRARY_FOR_DISTRIBUTION=YES \
   CODE_SIGNING_ALLOWED=NO \
-  clean build
+  clean build 2>&1 | tee "$BUILD_LOG"
+build_status=${PIPESTATUS[0]}
+set -e
+
+if [ "$build_status" -ne 0 ]; then
+  echo "xcodebuild failed with status $build_status"
+  echo "Recent diagnostics from $BUILD_LOG:"
+  grep -nE "(error:|warning:|BUILD FAILED|The following build commands failed)" "$BUILD_LOG" | tail -80 || true
+  exit "$build_status"
+fi
 
 copy_framework() {
   local name="$1"
@@ -64,4 +77,3 @@ copy_framework "CocoaLumberjack"
 
 ditto -c -k --sequesterRsrc --keepParent "$PACKAGE_DIR" "$DIST_DIR/Rokid-CXRL.zip"
 echo "Packaged $DIST_DIR/Rokid-CXRL.zip"
-

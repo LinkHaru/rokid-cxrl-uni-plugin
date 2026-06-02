@@ -31,6 +31,16 @@ jobs:
         shell: bash
         run: bash scripts/build_ios_plugin.sh
 
+      - name: Upload build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Rokid-CXRL-build-diagnostics
+          path: |
+            dist/build-ios-plugin.log
+            dist/RokidCXRLBuild.xcresult
+          if-no-files-found: ignore
+
       - name: Upload plugin zip
         uses: actions/upload-artifact@v7
         with:

@@ -4,7 +4,6 @@ import UIKit
 import RGCxrClient
 import RGCoreKit
 
-@objcMembers
 @objc(RokidCXRLBridge)
 public final class RokidCXRLBridge: NSObject {
     private static let instance = RokidCXRLBridge()
@@ -16,10 +15,12 @@ public final class RokidCXRLBridge: NSObject {
     private var eventHandler: ((NSDictionary) -> Void)?
     private let defaultPackageName = "com.rokid.cxrswithcxrl"
 
-    @objc public static func sharedInstance() -> RokidCXRLBridge {
+    @objc(sharedInstance)
+    public static func sharedInstance() -> RokidCXRLBridge {
         return instance
     }
 
+    @objc(bindEventsIfNeeded)
     public func bindEventsIfNeeded() {
         guard !eventsBound else { return }
         eventsBound = true
@@ -55,6 +56,7 @@ public final class RokidCXRLBridge: NSObject {
             .store(in: &cancellables)
     }
 
+    @objc(initializeClient:completion:)
     public func initializeClient(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         bindEventsIfNeeded()
         configureAuthFromOptions(options["auth"] as? NSDictionary)
@@ -83,11 +85,13 @@ public final class RokidCXRLBridge: NSObject {
         completion(ok(["outcome": outcome, "initialized": initialized]))
     }
 
+    @objc(configureAuth:)
     public func configureAuth(_ options: NSDictionary) -> NSDictionary {
         configureAuthFromOptions(options)
         return ok([:])
     }
 
+    @objc(authenticate:completion:)
     public func authenticate(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let scopes = stringArray(options["scopes"]) ?? ["device_control", "audio_stream"]
         let bundleId = string(options["bundleId"])
@@ -108,6 +112,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(refreshToken:completion:)
     public func refreshToken(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let scopes = stringArray(options["scopes"])
         client.auth.refreshToken(scopes: scopes) { result in
@@ -125,27 +130,32 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(clearAuthentication)
     public func clearAuthentication() -> NSDictionary {
         client.auth.clearAuthentication()
         return ok([:])
     }
 
+    @objc(watchEvents:)
     public func watchEvents(_ handler: @escaping (NSDictionary) -> Void) {
         bindEventsIfNeeded()
         eventHandler = handler
     }
 
+    @objc(unwatchEvents)
     public func unwatchEvents() -> NSDictionary {
         eventHandler = nil
         return ok([:])
     }
 
+    @objc(setNotifyEventListenCmds:)
     public func setNotifyEventListenCmds(_ options: NSDictionary) -> NSDictionary {
         let cmds = stringArray(options["cmds"]) ?? []
         client.setNotifyEventListenCmds(cmds)
         return ok(["cmds": cmds])
     }
 
+    @objc(sendCustomCmd:completion:)
     public func sendCustomCmd(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let cmd = string(options["cmd"]), !cmd.isEmpty else {
             completion(fail("invalid_cmd", "cmd is required"))
@@ -168,6 +178,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(openCustomView:completion:)
     public func openCustomView(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let view = string(options["view"]) else {
             completion(fail("invalid_view", "view json string is required"))
@@ -182,6 +193,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(updateCustomView:completion:)
     public func updateCustomView(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let view = string(options["view"]) ?? string(options["updates"]) else {
             completion(fail("invalid_view", "view or updates json string is required"))
@@ -192,6 +204,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(closeCustomView:completion:)
     public func closeCustomView(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let view = string(options["view"]) else {
             completion(fail("invalid_view", "view json string is required"))
@@ -202,6 +215,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(sendCustomViewIcons:completion:)
     public func sendCustomViewIcons(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let icons = string(options["icons"]) else {
             completion(fail("invalid_icons", "icons json string is required"))
@@ -212,28 +226,33 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(startRecord:)
     public func startRecord(_ options: NSDictionary) -> NSDictionary {
         let type = string(options["type"]) ?? "test"
         client.startRecord(type, codec: audioCodec(options["codec"]), mode: audioMode(options["mode"]))
         return ok(["type": type])
     }
 
+    @objc(stopRecord:)
     public func stopRecord(_ options: NSDictionary) -> NSDictionary {
         let type = string(options["type"]) ?? "test"
         client.stopRecord(type)
         return ok(["type": type])
     }
 
+    @objc(startPlayAudio:)
     public func startPlayAudio(_ options: NSDictionary) -> NSDictionary {
         client.startPlayAudio(codec: audioCodec(options["codec"]))
         return ok([:])
     }
 
+    @objc(stopPlayAudio)
     public func stopPlayAudio() -> NSDictionary {
         client.stopPlayAudio()
         return ok([:])
     }
 
+    @objc(feedAudio:)
     public func feedAudio(_ options: NSDictionary) -> NSDictionary {
         guard let data = dataFromOptions(options) else {
             return fail("invalid_audio", "payloadBase64 or text is required")
@@ -242,11 +261,13 @@ public final class RokidCXRLBridge: NSObject {
         return ok(["bytes": data.count])
     }
 
+    @objc(takePhoto)
     public func takePhoto() -> NSDictionary {
         client.takePhoto()
         return ok([:])
     }
 
+    @objc(takePhotoWithData:completion:)
     public func takePhotoWithData(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let width = int(options["width"]) ?? 1920
         let height = int(options["height"]) ?? 1080
@@ -262,12 +283,14 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(queryApp:)
     public func queryApp(_ completion: @escaping (NSDictionary) -> Void) {
         client.queryApp { success in
             completion(success ? self.ok(["success": true]) : self.fail("query_app_failed", "queryApp failed"))
         }
     }
 
+    @objc(openApp:completion:)
     public func openApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let activityName = string(options["activityName"]) ?? "com.rokid.cxrswithcxrl.activities.main.MainActivity"
         let url = string(options["url"]) ?? ""
@@ -276,6 +299,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(stopApp:completion:)
     public func stopApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let packageName = string(options["packageName"]) ?? defaultPackageName
         client.stopApp(packageName) { success in
@@ -283,6 +307,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(uninstallApp:completion:)
     public func uninstallApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let packageName = string(options["packageName"]) ?? defaultPackageName
         client.uninstallApp(packageName) { success in
@@ -290,6 +315,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(installApp:completion:)
     public func installApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         guard let path = string(options["path"]), !path.isEmpty else {
             completion(fail("invalid_path", "path is required"))
@@ -300,6 +326,7 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(changeAudioSceneId:completion:)
     public func changeAudioSceneId(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
         let scene = RGCxrAudioSceneId(rawValue: int(options["sceneId"]) ?? 0) ?? .interaction
         client.changeAudioSceneId(scene) { success in
@@ -307,22 +334,27 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
+    @objc(handleOpenURL:)
     public func handleOpenURL(_ url: URL) -> Bool {
         return client.handleOpenURL(url)
     }
 
+    @objc(isInitialized)
     public func isInitialized() -> NSDictionary {
         return ok(["initialized": initialized])
     }
 
+    @objc(isAuthenticated)
     public func isAuthenticated() -> NSDictionary {
         return ok(["authenticated": client.auth.isAuthenticated()])
     }
 
+    @objc(getAuthState)
     public func getAuthState() -> NSDictionary {
         return ok(authStatePayload(client.auth.currentState))
     }
 
+    @objc(getCurrentToken)
     public func getCurrentToken() -> NSDictionary {
         return ok([
             "token": client.auth.getCurrentToken() ?? "",
@@ -331,6 +363,7 @@ public final class RokidCXRLBridge: NSObject {
         ])
     }
 
+    @objc(isRokidAppInstalled)
     public func isRokidAppInstalled() -> NSDictionary {
         guard let url = URL(string: "rokidai://") else {
             return ok(["installed": false])
