@@ -12,9 +12,11 @@ jobs:
     runs-on: macos-15
     env:
       COCOAPODS_DISABLE_STATS: "true"
+      XCODE_APP: Xcode_26.3.app
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Select requested Xcode
         shell: bash
@@ -30,8 +32,7 @@ jobs:
         run: bash scripts/build_ios_plugin.sh
 
       - name: Upload plugin zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Rokid-CXRL
           path: dist/Rokid-CXRL.zip
-

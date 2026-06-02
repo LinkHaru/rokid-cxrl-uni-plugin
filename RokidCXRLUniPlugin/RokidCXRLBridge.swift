@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import UIKit
 import RGCxrClient
 import RGCoreKit
 
@@ -10,7 +11,9 @@ public final class RokidCXRLBridge: NSObject {
     private let client: any RGCxrClient = CxrClient.shared
     private var cancellables = Set<AnyCancellable>()
     private var eventsBound = false
+    private var initialized = false
     private var eventHandler: ((NSDictionary) -> Void)?
+    private let defaultPackageName = "com.rokid.cxrswithcxrl"
 
     @objc public static func sharedInstance() -> RokidCXRLBridge {
         return instance
@@ -68,13 +71,15 @@ public final class RokidCXRLBridge: NSObject {
         switch result {
         case .success:
             outcome = "success"
+            initialized = true
         case .failureAlreadyInitialized:
             outcome = "failureAlreadyInitialized"
+            initialized = true
         @unknown default:
             outcome = "unknown"
         }
 
-        completion(ok(["outcome": outcome, "initialized": CxrClient.isInitialized]))
+        completion(ok(["outcome": outcome, "initialized": initialized]))
     }
 
     public func configureAuth(_ options: NSDictionary) -> NSDictionary {
@@ -270,14 +275,16 @@ public final class RokidCXRLBridge: NSObject {
         }
     }
 
-    public func stopApp(_ completion: @escaping (NSDictionary) -> Void) {
-        client.stopApp { success in
+    public func stopApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
+        let packageName = string(options["packageName"]) ?? defaultPackageName
+        client.stopApp(packageName) { success in
             completion(success ? self.ok(["success": true]) : self.fail("stop_app_failed", "stopApp failed"))
         }
     }
 
-    public func uninstallApp(_ completion: @escaping (NSDictionary) -> Void) {
-        client.uninstallApp { success in
+    public func uninstallApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
+        let packageName = string(options["packageName"]) ?? defaultPackageName
+        client.uninstallApp(packageName) { success in
             completion(success ? self.ok(["success": true]) : self.fail("uninstall_app_failed", "uninstallApp failed"))
         }
     }
@@ -304,7 +311,7 @@ public final class RokidCXRLBridge: NSObject {
     }
 
     public func isInitialized() -> NSDictionary {
-        return ok(["initialized": CxrClient.isInitialized])
+        return ok(["initialized": initialized])
     }
 
     public func isAuthenticated() -> NSDictionary {
@@ -324,7 +331,10 @@ public final class RokidCXRLBridge: NSObject {
     }
 
     public func isRokidAppInstalled() -> NSDictionary {
-        return ok(["installed": client.isRokidAppInstalled()])
+        guard let url = URL(string: "rokidai://") else {
+            return ok(["installed": false])
+        }
+        return ok(["installed": UIApplication.shared.canOpenURL(url)])
     }
 
     private func configureAuthFromOptions(_ options: NSDictionary?) {
@@ -528,4 +538,3 @@ public final class RokidCXRLBridge: NSObject {
         return nil
     }
 }
-

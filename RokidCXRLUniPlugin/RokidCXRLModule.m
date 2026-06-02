@@ -176,13 +176,13 @@ UNI_EXPORT_METHOD_SYNC(@selector(isRokidAppInstalled:))
 }
 
 - (void)stopApp:(NSDictionary *)options callback:(UniModuleKeepAliveCallback)callback {
-    [[self bridge] stopApp:^(NSDictionary *result) {
+    [[self bridge] stopApp:[self safeOptions:options] completion:^(NSDictionary *result) {
         [self callback:callback result:result keepAlive:NO];
     }];
 }
 
 - (void)uninstallApp:(NSDictionary *)options callback:(UniModuleKeepAliveCallback)callback {
-    [[self bridge] uninstallApp:^(NSDictionary *result) {
+    [[self bridge] uninstallApp:[self safeOptions:options] completion:^(NSDictionary *result) {
         [self callback:callback result:result keepAlive:NO];
     }];
 }
@@ -220,4 +220,3 @@ UNI_EXPORT_METHOD_SYNC(@selector(isRokidAppInstalled:))
 }
 
 @end
-
