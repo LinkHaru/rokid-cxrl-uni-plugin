@@ -1,5 +1,43 @@
 #import "RokidCXRLModule.h"
-#import "RokidCXRLUniPlugin-Swift.h"
+
+@protocol RokidCXRLBridgeProtocol <NSObject>
+- (void)bindEventsIfNeeded;
+- (void)initializeClient:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (NSDictionary *)configureAuth:(NSDictionary *)options;
+- (void)authenticate:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)refreshToken:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (NSDictionary *)clearAuthentication;
+- (void)watchEvents:(void (^)(NSDictionary *event))handler;
+- (NSDictionary *)unwatchEvents;
+- (NSDictionary *)setNotifyEventListenCmds:(NSDictionary *)options;
+- (void)sendCustomCmd:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)openCustomView:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)updateCustomView:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)closeCustomView:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)sendCustomViewIcons:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (NSDictionary *)startRecord:(NSDictionary *)options;
+- (NSDictionary *)stopRecord:(NSDictionary *)options;
+- (NSDictionary *)startPlayAudio:(NSDictionary *)options;
+- (NSDictionary *)stopPlayAudio;
+- (NSDictionary *)feedAudio:(NSDictionary *)options;
+- (NSDictionary *)takePhoto;
+- (void)takePhotoWithData:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)queryApp:(void (^)(NSDictionary *result))completion;
+- (void)openApp:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)stopApp:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)uninstallApp:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)installApp:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (void)changeAudioSceneId:(NSDictionary *)options completion:(void (^)(NSDictionary *result))completion;
+- (NSDictionary *)isInitialized;
+- (NSDictionary *)isAuthenticated;
+- (NSDictionary *)getAuthState;
+- (NSDictionary *)getCurrentToken;
+- (NSDictionary *)isRokidAppInstalled;
+@end
+
+@interface RokidCXRLBridge : NSObject
++ (id<RokidCXRLBridgeProtocol>)sharedInstance;
+@end
 
 @implementation RokidCXRLModule
 
@@ -36,7 +74,7 @@ UNI_EXPORT_METHOD_SYNC(@selector(getAuthState:))
 UNI_EXPORT_METHOD_SYNC(@selector(getCurrentToken:))
 UNI_EXPORT_METHOD_SYNC(@selector(isRokidAppInstalled:))
 
-- (RokidCXRLBridge *)bridge {
+- (id<RokidCXRLBridgeProtocol>)bridge {
     return [RokidCXRLBridge sharedInstance];
 }
 

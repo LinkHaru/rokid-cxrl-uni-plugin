@@ -5,6 +5,7 @@ import RGCxrClient
 import RGCoreKit
 
 @objcMembers
+@objc(RokidCXRLBridge)
 public final class RokidCXRLBridge: NSObject {
     private static let instance = RokidCXRLBridge()
 

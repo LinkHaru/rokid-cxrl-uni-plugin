@@ -1,5 +1,13 @@
 #import "RokidCXRLPluginProxy.h"
-#import "RokidCXRLUniPlugin-Swift.h"
+
+@protocol RokidCXRLBridgeLifecycle <NSObject>
+- (void)bindEventsIfNeeded;
+- (BOOL)handleOpenURL:(NSURL *)url;
+@end
+
+@interface RokidCXRLBridge : NSObject
++ (id<RokidCXRLBridgeLifecycle>)sharedInstance;
+@end
 
 @implementation RokidCXRLPluginProxy
 
@@ -21,4 +29,3 @@
 }
 
 @end
-
