@@ -11,6 +11,7 @@
 		A20000000000000000000002 /* RokidCXRLModule.m in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000003 /* RokidCXRLModule.m */; };
 		A20000000000000000000003 /* RokidCXRLPluginProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000005 /* RokidCXRLPluginProxy.m */; };
 		A20000000000000000000004 /* RokidCXRLBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A30000000000000000000006 /* RokidCXRLBridge.swift */; };
+		A20000000000000000000005 /* RGCxrClient.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A3000000000000000000000A /* RGCxrClient.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		A30000000000000000000007 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A30000000000000000000008 /* RokidCXRLUniPlugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RokidCXRLUniPlugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A30000000000000000000009 /* DCloudShim */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DCloudShim; sourceTree = "<group>"; };
+		A3000000000000000000000A /* RGCxrClient.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RGCxrClient.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A20000000000000000000005 /* RGCxrClient.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +44,7 @@
 			children = (
 				A50000000000000000000002 /* RokidCXRLUniPlugin */,
 				A30000000000000000000009 /* DCloudShim */,
+				A50000000000000000000004 /* Vendor */,
 				A50000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -65,6 +69,14 @@
 				A30000000000000000000008 /* RokidCXRLUniPlugin.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		A50000000000000000000004 /* Vendor */ = {
+			isa = PBXGroup;
+			children = (
+				A3000000000000000000000A /* RGCxrClient.framework */,
+			);
+			path = Vendor;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -275,6 +287,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/Vendor",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -291,7 +304,11 @@
 				);
 				MACH_O_TYPE = staticlib;
 				MARKETING_VERSION = 0.1.0;
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					RGCxrClient,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.dcloud.RokidCXRLUniPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -314,6 +331,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/Vendor",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -330,7 +348,11 @@
 				);
 				MACH_O_TYPE = staticlib;
 				MARKETING_VERSION = 0.1.0;
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					RGCxrClient,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.dcloud.RokidCXRLUniPlugin;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -365,4 +387,3 @@
 	};
 	rootObject = A80000000000000000000001 /* Project object */;
 }
-

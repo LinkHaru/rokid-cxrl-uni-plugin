@@ -55,6 +55,7 @@ copy_framework() {
   for candidate in \
     "$BUILD_DIR/Release-iphoneos/$name.framework" \
     "$BUILD_DIR/Release-iphoneos/$name/$name.framework" \
+    "$ROOT_DIR/Vendor/$name.framework" \
     "$ROOT_DIR/Pods/$name/$name.framework"; do
     if [ -d "$candidate" ]; then
       source="$candidate"

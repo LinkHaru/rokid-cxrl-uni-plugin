@@ -13,7 +13,6 @@ public final class RokidCXRLBridge: NSObject {
     private var eventsBound = false
     private var initialized = false
     private var eventHandler: ((NSDictionary) -> Void)?
-    private let defaultPackageName = "com.rokid.cxrswithcxrl"
 
     @objc(sharedInstance)
     public static func sharedInstance() -> RokidCXRLBridge {
@@ -301,16 +300,14 @@ public final class RokidCXRLBridge: NSObject {
 
     @objc(stopApp:completion:)
     public func stopApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
-        let packageName = string(options["packageName"]) ?? defaultPackageName
-        client.stopApp(packageName) { success in
+        client.stopApp { success in
             completion(success ? self.ok(["success": true]) : self.fail("stop_app_failed", "stopApp failed"))
         }
     }
 
     @objc(uninstallApp:completion:)
     public func uninstallApp(_ options: NSDictionary, completion: @escaping (NSDictionary) -> Void) {
-        let packageName = string(options["packageName"]) ?? defaultPackageName
-        client.uninstallApp(packageName) { success in
+        client.uninstallApp { success in
             completion(success ? self.ok(["success": true]) : self.fail("uninstall_app_failed", "uninstallApp failed"))
         }
     }

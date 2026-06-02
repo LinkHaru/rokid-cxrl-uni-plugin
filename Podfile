@@ -5,8 +5,6 @@ project 'RokidCXRLUniPlugin.xcodeproj'
 use_frameworks!
 
 target 'RokidCXRLUniPlugin' do
-  pod 'RGCxrClient', '1.0.1'
   pod 'RGCoreKit', '0.0.2'
   pod 'CocoaLumberjack/Swift', '3.9.1'
 end
-
